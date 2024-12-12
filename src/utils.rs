@@ -20,6 +20,22 @@ pub async fn get_title_id(name: &str, pool: &Pool<Sqlite>) -> i32 {
     };
 }
 
+pub async fn search_titles_by_name(pool: &SqlitePool, query: &str) -> Vec<String> {
+    let query = format!("%{}%", query);
+    
+    match sqlx::query("SELECT title_name FROM Titles WHERE title_name LIKE ? LIMIT 10")
+        .bind(query)
+        .fetch_all(pool)
+        .await
+    {
+        Ok(rows) => rows
+            .into_iter()
+            .map(|row| row.get::<String, _>("title_name"))
+            .collect(),
+        Err(_) => vec![],
+    }
+}
+
 pub async fn get_supported_titles(pool: &SqlitePool) -> Vec<String> {
     match sqlx::query("SELECT title_name FROM Titles")
         .fetch_all(pool)

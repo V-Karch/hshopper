@@ -28,6 +28,22 @@ async fn main() -> WebDriverResult<()> {
         return Ok(());
     }
 
+    if parsed_argument == "search" && args.len() >= 2 {
+        println!("Searching for title `{}`...", args[1]);
+
+        let results = utils::search_titles_by_name(
+            &pool, 
+            &args[1]
+                .to_ascii_lowercase()
+                .replace(" ", " "))
+                .await;
+
+        println!("Top 10 Related Results:");
+        println!("{}", results.join("\n"));
+
+        return Ok(());
+    }
+
     let title_id = utils::get_title_id(&parsed_argument, &pool).await;
 
     if title_id < 0 {
