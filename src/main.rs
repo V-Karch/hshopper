@@ -9,7 +9,7 @@ async fn main() -> WebDriverResult<()> {
     let args: Vec<String> = std::env::args().skip(1).collect();
 
     if args.len() == 0 {
-        println!("Game title required.");
+        utils::display_help_message();
         return Ok(());
     }
 

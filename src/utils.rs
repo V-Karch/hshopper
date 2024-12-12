@@ -47,3 +47,11 @@ pub async fn download_with_progress(url: &str, name: &str) -> Result<(), Box<dyn
     pb.finish_with_message("Download complete");
     Ok(())
 }
+
+pub fn display_help_message() {
+    println!("Usage:");
+    println!("./hshopper <title-name>");
+    println!("For example: `./hshopper \"pokemon ultra moon\"` would result in downloading `pokemon-ultra-moon.cia`");
+    println!("Note that this is encrypted and must be decrypted with cia-unix or something similar before use");
+    println!("\nIf you are having trouble running this program, make sure that you have installed `geckodriver` and that it is running");
+}
