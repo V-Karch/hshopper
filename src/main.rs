@@ -1,7 +1,6 @@
 mod utils;
 
 use tokio;
-use sqlx::{Pool, Row, Sqlite};
 use reqwest::Client;
 use std::time::Duration;
 use thirtyfour::prelude::*;
@@ -27,7 +26,7 @@ async fn main() -> WebDriverResult<()> {
         .await
         .expect("Failed to load database pool");
     
-    let title_id = get_title_id(&parsed_argument, &pool).await;
+    let title_id = utils::get_title_id(&parsed_argument, &pool).await;
 
     if title_id < 0 {
         println!("Title `{}` was not found in the database", &parsed_argument);
@@ -63,16 +62,6 @@ async fn main() -> WebDriverResult<()> {
     driver.quit().await?;
 
     Ok(())
-}
-
-async fn get_title_id(name: &str, pool: &Pool<Sqlite>) -> i32 {
-    return match sqlx::query("SELECT * FROM Titles WHERE title_name = ?")
-    .bind(name)
-    .fetch_one(pool)
-    .await {
-        Ok(row) => row.get("id"),
-        Err(_) => -1,
-    };
 }
 
 async fn download_with_progress(url: &str, name: &str) -> Result<(), Box<dyn std::error::Error>> {
