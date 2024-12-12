@@ -1,20 +1,26 @@
-use reqwest::Client;
 use futures_util::StreamExt;
-use tokio::io::AsyncWriteExt;
-use tokio::fs::File as AsyncFile;
 use indicatif::{ProgressBar, ProgressStyle};
-use sqlx::{sqlite::SqlitePool, Pool, Sqlite, Row};            
+use reqwest::Client;
+use sqlx::{sqlite::SqlitePool, Pool, Row, Sqlite};
+use tokio::fs::File as AsyncFile;
+use tokio::io::AsyncWriteExt;
 
-pub async fn connect() -> Result<Pool<sqlx::Sqlite>, sqlx::Error> {                                                                                                                                              
-    let pool: Pool<sqlx::Sqlite> = SqlitePool::connect("sqlite:titledb.db").await?;                                                                                                                              
-    return Ok(pool);                                                                                                                                                                                                     
+pub static BLUE: &str = "\x1b[38;2;98;152;214m";
+pub static GREEN: &str = "\x1b[38;2;10;178;46m";
+pub static WHITE: &str = "\x1b[38;2;255;255;255m";
+pub static RESET: &str = "\x1b[0m";
+
+pub async fn connect() -> Result<Pool<sqlx::Sqlite>, sqlx::Error> {
+    let pool: Pool<sqlx::Sqlite> = SqlitePool::connect("sqlite:titledb.db").await?;
+    return Ok(pool);
 }
 
 pub async fn get_title_id(name: &str, pool: &Pool<Sqlite>) -> i32 {
     return match sqlx::query("SELECT * FROM Titles WHERE title_name = ?")
-    .bind(name)
-    .fetch_one(pool)
-    .await {
+        .bind(name)
+        .fetch_one(pool)
+        .await
+    {
         Ok(row) => row.get("id"),
         Err(_) => -1,
     };
@@ -22,7 +28,7 @@ pub async fn get_title_id(name: &str, pool: &Pool<Sqlite>) -> i32 {
 
 pub async fn search_titles_by_name(pool: &SqlitePool, query: &str) -> Vec<String> {
     let query = format!("%{}%", query);
-    
+
     match sqlx::query("SELECT title_name FROM Titles WHERE title_name LIKE ? LIMIT 10")
         .bind(query)
         .fetch_all(pool)
@@ -49,16 +55,21 @@ pub async fn get_supported_titles(pool: &SqlitePool) -> Vec<String> {
     }
 }
 
-pub async fn download_with_progress(url: &str, name: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn download_with_progress(
+    url: &str,
+    name: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
     let client = Client::new();
     let response = client.get(url).send().await?;
 
-    let total_size = response.content_length().ok_or("Failed to get content length")?;
+    let total_size = response
+        .content_length()
+        .ok_or("Failed to get content length")?;
 
     let pb = ProgressBar::new(total_size);
     pb.set_style(
         ProgressStyle::default_bar()
-            .template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} ({eta})")?
+            .template("{spinner:.GREEN} [{elapsed_precise}] [{wide_bar:.cyan/BLUE}] {bytes}/{total_bytes} ({eta})")?
             .progress_chars("#>-"),
     );
 
@@ -78,9 +89,16 @@ pub async fn download_with_progress(url: &str, name: &str) -> Result<(), Box<dyn
 }
 
 pub fn display_help_message() {
-    println!("Usage:");
-    println!("./hshopper \"<title-name>\" // Starts downloading the requested title to a cia file");
-    println!("./hshopper search \"<title-name>\" // Searches the title database and gives you the results that are most like your search");
-    println!("./hshopper list-supported // Lists all supported titles");
-    println!("\nIf you are having trouble running this program, make sure that you have installed `geckodriver` and that it is running");
+    println!("{}Usage:{}", WHITE, RESET);
+    println!("{}./hshopper {}\"<title-name>\" {}// Starts downloading the requested title to a cia file{}", BLUE, WHITE, GREEN, RESET);
+    println!("{}./hshopper search {}\"<title-name>\" {}// Searches the title database and gives you the results that are most like your search{}",
+        BLUE, WHITE, GREEN, RESET
+    );
+    println!(
+        "{}./hshopper {}list-supported {}// Lists all supported titles{}",
+        BLUE, WHITE, GREEN, RESET
+    );
+    println!("{}\nIf you are having trouble running this program, make sure that you have installed {}`geckodriver`{} and that it is running{}",
+        WHITE, BLUE, WHITE, RESET
+    );
 }
