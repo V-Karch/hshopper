@@ -33,13 +33,13 @@ pub async fn download_with_progress(url: &str, name: &str) -> Result<(), Box<dyn
             .progress_chars("#>-"),
     );
 
-    let mut file = AsyncFile::create(format!("{}.cia", name)).await?; // Use async file creation with tokio::fs::File.
+    let mut file = AsyncFile::create(format!("{}.cia", name)).await?;
     let mut downloaded: u64 = 0;
     let mut stream = response.bytes_stream();
 
     while let Some(chunk) = stream.next().await {
         let chunk = chunk?;
-        file.write_all(&chunk).await?; // Use async file writing.
+        file.write_all(&chunk).await?;
         downloaded += chunk.len() as u64;
         pb.set_position(downloaded);
     }
