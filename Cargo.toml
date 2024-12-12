@@ -1,5 +1,5 @@
 [package]
-name = "testing"
+name = "hshopper"
 version = "0.0.1"
 edition = "2021"
 
@@ -10,5 +10,3 @@ reqwest = { version = "0.12.9", features = ["json", "stream"] }
 indicatif = "0.17"
 futures-util = "0.3.31"
 sqlx = { version = "0.8.2", features = ["sqlite", "runtime-tokio-native-tls"] }
-
-
