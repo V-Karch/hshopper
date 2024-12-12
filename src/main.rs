@@ -1,13 +1,8 @@
 mod utils;
 
 use tokio;
-use reqwest::Client;
 use std::time::Duration;
 use thirtyfour::prelude::*;
-use futures_util::StreamExt;
-use tokio::io::AsyncWriteExt;
-use tokio::fs::File as AsyncFile;
-use indicatif::{ProgressBar, ProgressStyle};
 
 #[tokio::main]
 async fn main() -> WebDriverResult<()> {
@@ -50,7 +45,7 @@ async fn main() -> WebDriverResult<()> {
         Some(url) => {
             println!("Requesting URL `{}`...", url);
 
-            if let Err(e) = download_with_progress(&url, &parsed_argument).await {
+            if let Err(e) = utils::download_with_progress(&url, &parsed_argument).await {
                 eprintln!("Error during download: {}", e);
             }
         }
@@ -61,33 +56,5 @@ async fn main() -> WebDriverResult<()> {
 
     driver.quit().await?;
 
-    Ok(())
-}
-
-async fn download_with_progress(url: &str, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::new();
-    let response = client.get(url).send().await?;
-
-    let total_size = response.content_length().ok_or("Failed to get content length")?;
-
-    let pb = ProgressBar::new(total_size);
-    pb.set_style(
-        ProgressStyle::default_bar()
-            .template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} ({eta})")?
-            .progress_chars("#>-"),
-    );
-
-    let mut file = AsyncFile::create(format!("{}.cia", name)).await?; // Use async file creation with tokio::fs::File.
-    let mut downloaded: u64 = 0;
-    let mut stream = response.bytes_stream();
-
-    while let Some(chunk) = stream.next().await {
-        let chunk = chunk?;
-        file.write_all(&chunk).await?; // Use async file writing.
-        downloaded += chunk.len() as u64;
-        pb.set_position(downloaded);
-    }
-
-    pb.finish_with_message("Download complete");
     Ok(())
 }
