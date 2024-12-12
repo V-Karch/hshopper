@@ -20,6 +20,19 @@ pub async fn get_title_id(name: &str, pool: &Pool<Sqlite>) -> i32 {
     };
 }
 
+pub async fn get_supported_titles(pool: &SqlitePool) -> Vec<String> {
+    match sqlx::query("SELECT title_name FROM Titles")
+        .fetch_all(pool)
+        .await
+    {
+        Ok(rows) => rows
+            .into_iter()
+            .map(|row| row.get::<String, _>("title_name"))
+            .collect(),
+        Err(_) => vec![],
+    }
+}
+
 pub async fn download_with_progress(url: &str, name: &str) -> Result<(), Box<dyn std::error::Error>> {
     let client = Client::new();
     let response = client.get(url).send().await?;

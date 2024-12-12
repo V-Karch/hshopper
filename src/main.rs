@@ -21,6 +21,13 @@ async fn main() -> WebDriverResult<()> {
         .await
         .expect("Failed to load database pool");
     
+    if parsed_argument == "list-supported" {
+        let supported = utils::get_supported_titles(&pool).await;
+        println!("Supported titles:");
+        println!("{}", supported.join("\n"));
+        return Ok(());
+    }
+
     let title_id = utils::get_title_id(&parsed_argument, &pool).await;
 
     if title_id < 0 {
