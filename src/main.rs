@@ -23,21 +23,24 @@ async fn main() -> WebDriverResult<()> {
         let supported = utils::get_supported_titles(&pool).await;
         println!("{}Supported titles:{}", utils::BLUE, utils::RESET);
         println!("{}{}{}", utils::WHITE, supported.join(", "), utils::RESET);
+        println!("\n{}{} total supported titles.{}", utils::GREEN, supported.len(), utils::RESET);
         return Ok(());
     }
 
     if parsed_argument == "search" && args.len() >= 2 {
+        let search_title = args[1..].join("-").to_ascii_lowercase();
+
         println!(
             "{}Searching for title {}`{}`{}...{}",
             utils::BLUE,
             utils::WHITE,
-            args[1],
+            search_title,
             utils::BLUE,
             utils::RESET
         );
 
         let results =
-            utils::search_titles_by_name(&pool, &args[1].to_ascii_lowercase().replace(" ", " "))
+            utils::search_titles_by_name(&pool, &search_title)
                 .await;
 
         println!("{}Top 10 Related Results:{}\n", utils::BLUE, utils::RESET);

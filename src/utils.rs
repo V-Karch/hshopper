@@ -119,12 +119,15 @@ pub async fn download_with_progress(
 pub fn display_help_message() {
     println!("{}Usage:{}", WHITE, RESET);
     println!("{}./hshopper {}\"<title-name>\" {}// Starts downloading the requested title to a cia file{}", BLUE, WHITE, GREEN, RESET);
-    println!("{}./hshopper search {}\"<title-name>\" {}// Searches the title database and gives you the results that are most like your search{}",
+    println!("{}./hshopper search {}<title-name> {}// Searches the title database and gives you the results that are most like your search{}",
+        BLUE, WHITE, GREEN, RESET
+    );
+    println!("{}./hshopper add {}<id> <title-name> {}// Adds a title with it's matching id to the database{}",
         BLUE, WHITE, GREEN, RESET
     );
     println!(
-        "{}./hshopper {}list-supported {}// Lists all supported titles{}",
-        BLUE, WHITE, GREEN, RESET
+        "{}./hshopper list-supported {}// Lists all supported titles{}",
+        BLUE, GREEN, RESET
     );
     println!("{}\nIf you are having trouble running this program, make sure that you have installed {}`geckodriver`{} and that it is running{}",
         WHITE, BLUE, WHITE, RESET
