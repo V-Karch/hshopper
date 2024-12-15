@@ -1,6 +1,5 @@
 mod utils;
 
-use std::time::Duration;
 use thirtyfour::prelude::*;
 use tokio;
 
@@ -23,7 +22,12 @@ async fn main() -> WebDriverResult<()> {
         let supported = utils::get_supported_titles(&pool).await;
         println!("{}Supported titles:{}", utils::BLUE, utils::RESET);
         println!("{}{}{}", utils::WHITE, supported.join(", "), utils::RESET);
-        println!("\n{}{} total supported titles.{}", utils::GREEN, supported.len(), utils::RESET);
+        println!(
+            "\n{}{} total supported titles.{}",
+            utils::GREEN,
+            supported.len(),
+            utils::RESET
+        );
         return Ok(());
     }
 
@@ -39,9 +43,7 @@ async fn main() -> WebDriverResult<()> {
             utils::RESET
         );
 
-        let results =
-            utils::search_titles_by_name(&pool, &search_title)
-                .await;
+        let results = utils::search_titles_by_name(&pool, &search_title).await;
 
         println!("{}Top 10 Related Results:{}\n", utils::BLUE, utils::RESET);
         println!("{}{}{}", utils::WHITE, results.join(", "), utils::RESET);
@@ -111,39 +113,31 @@ async fn main() -> WebDriverResult<()> {
         return Ok(());
     }
 
-    let mut caps = DesiredCapabilities::firefox();
-    caps.set_headless().expect("Failed to set headless mode");
+    let base_text = reqwest::get(&format!("https://hshop.erista.me/t/{}", &title_id))
+        .await
+        .expect("Failed to make initial request")
+        .text()
+        .await
+        .expect("Failed to parse request text")
+        .lines()
+        .map(|f| f.to_string())
+        .collect::<Vec<String>>();
 
-    let driver = WebDriver::new("http://localhost:4444", caps).await?;
-    driver
-        .get(&format!("https://hshop.erista.me/t/{}", title_id))
-        .await?;
-    driver
-        .set_implicit_wait_timeout(Duration::from_secs(5))
-        .await?;
-
-    let download_button = driver
-        .find(By::XPath(
-            "/html/body/main/div[2]/div/div[2]/div/div[2]/div[1]/a",
-        ))
-        .await?;
-
-    let possible_download_url = download_button.attr("href").await?;
-
-    match possible_download_url {
-        Some(url) => {
-            println!("Requesting URL `{}`...", url);
-
-            if let Err(e) = utils::download_with_progress(&url, &parsed_argument).await {
-                eprintln!("Error during download: {}", e);
+    for i in &base_text {
+        if i.contains("Direct Download") {
+            if let Some(start) = i.find("href=\"") {
+                let url_start = start + 6;
+                if let Some(end) = i[url_start..].find('"') {
+                    let url = &i[url_start..url_start + end];
+                    println!("Requesting URL `{}`...", url);
+                    if let Err(e) = utils::download_with_progress(&url, &parsed_argument).await {
+                        eprintln!("Error during download: {}", e);
+                    }
+                }
             }
-        }
-        None => {
-            println!("Failed to get download URL");
+            break;
         }
     }
-
-    driver.quit().await?;
 
     Ok(())
 }

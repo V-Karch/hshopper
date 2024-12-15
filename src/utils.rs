@@ -129,7 +129,4 @@ pub fn display_help_message() {
         "{}./hshopper list-supported {}// Lists all supported titles{}",
         BLUE, GREEN, RESET
     );
-    println!("{}\nIf you are having trouble running this program, make sure that you have installed {}`geckodriver`{} and that it is running{}",
-        WHITE, BLUE, WHITE, RESET
-    );
 }
