@@ -26,6 +26,28 @@ pub async fn get_title_id(name: &str, pool: &Pool<Sqlite>) -> i32 {
     };
 }
 
+pub async fn add_title(id: u32, name: &str, pool: &Pool<Sqlite>) -> Result<i32, sqlx::Error> {
+    match sqlx::query("SELECT id FROM Titles WHERE id = ?")
+        .bind(id)
+        .fetch_one(pool)
+        .await
+    {
+        Ok(_) => {
+            return Ok(-1);
+        }
+        Err(sqlx::Error::RowNotFound) => {
+            sqlx::query("INSERT INTO Titles (id, title_name) VALUES (?, ?)")
+                .bind(id)
+                .bind(name)
+                .execute(pool)
+                .await?;
+
+            return Ok(id as i32);
+        }
+        Err(e) => Err(e),
+    }
+}
+
 pub async fn search_titles_by_name(pool: &SqlitePool, query: &str) -> Vec<String> {
     let query = format!("%{}%", query).replace(" ", "-");
 

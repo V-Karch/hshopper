@@ -1,8 +1,8 @@
 mod utils;
 
-use tokio;
 use std::time::Duration;
 use thirtyfour::prelude::*;
+use tokio;
 
 #[tokio::main]
 async fn main() -> WebDriverResult<()> {
@@ -13,14 +13,12 @@ async fn main() -> WebDriverResult<()> {
         return Ok(());
     }
 
-    let parsed_argument = args[0]
-        .to_ascii_lowercase()
-        .replace(" ", "-");
+    let parsed_argument = args[0].to_ascii_lowercase().replace(" ", "-");
 
     let pool = utils::connect()
         .await
         .expect("Failed to load database pool");
-    
+
     if parsed_argument == "list-supported" {
         let supported = utils::get_supported_titles(&pool).await;
         println!("{}Supported titles:{}", utils::BLUE, utils::RESET);
@@ -29,17 +27,76 @@ async fn main() -> WebDriverResult<()> {
     }
 
     if parsed_argument == "search" && args.len() >= 2 {
-        println!("{}Searching for title {}`{}`{}...{}", utils::BLUE, utils::WHITE, args[1], utils::BLUE, utils::RESET);
+        println!(
+            "{}Searching for title {}`{}`{}...{}",
+            utils::BLUE,
+            utils::WHITE,
+            args[1],
+            utils::BLUE,
+            utils::RESET
+        );
 
-        let results = utils::search_titles_by_name(
-            &pool, 
-            &args[1]
-                .to_ascii_lowercase()
-                .replace(" ", " "))
+        let results =
+            utils::search_titles_by_name(&pool, &args[1].to_ascii_lowercase().replace(" ", " "))
                 .await;
 
         println!("{}Top 10 Related Results:{}\n", utils::BLUE, utils::RESET);
         println!("{}{}{}", utils::WHITE, results.join(", "), utils::RESET);
+
+        return Ok(());
+    }
+
+    if parsed_argument == "add" && args.len() >= 2 {
+        let title_id = match args[1].parse::<u32>() {
+            Ok(value) => value,
+            Err(_) => {
+                println!("{}When adding to the title database, the second argument must be an {}integer id{} for the title, not {}`{}`{}", 
+                utils::BLUE, utils::WHITE, utils::BLUE, utils::WHITE, &args[1], utils::RESET
+            );
+                return Ok(());
+            }
+        };
+
+        let title = &args[2..].join("-");
+        println!(
+            "{}Attempting to add title {}`{}`{} with {}id `{}`{}",
+            utils::BLUE,
+            utils::WHITE,
+            title,
+            utils::BLUE,
+            utils::WHITE,
+            title_id,
+            utils::RESET
+        );
+
+        let add_result = match utils::add_title(title_id, &title, &pool).await {
+            Ok(value) => value,
+            Err(_) => -1,
+        };
+
+        if add_result >= 1 {
+            println!(
+                "{}Added title {}`{}`{} to the databae with {}id `{}`{}",
+                utils::BLUE,
+                utils::WHITE,
+                title,
+                utils::BLUE,
+                utils::WHITE,
+                title_id,
+                utils::RESET
+            );
+        } else {
+            println!(
+                "{}Could not add title {}`{}`{} to database with {}id `{}`{}",
+                utils::BLUE,
+                utils::WHITE,
+                title,
+                utils::BLUE,
+                utils::WHITE,
+                title_id,
+                utils::RESET
+            )
+        }
 
         return Ok(());
     }
@@ -55,11 +112,17 @@ async fn main() -> WebDriverResult<()> {
     caps.set_headless().expect("Failed to set headless mode");
 
     let driver = WebDriver::new("http://localhost:4444", caps).await?;
-    driver.get(&format!("https://hshop.erista.me/t/{}", title_id)).await?;
-    driver.set_implicit_wait_timeout(Duration::from_secs(5)).await?;
+    driver
+        .get(&format!("https://hshop.erista.me/t/{}", title_id))
+        .await?;
+    driver
+        .set_implicit_wait_timeout(Duration::from_secs(5))
+        .await?;
 
     let download_button = driver
-        .find(By::XPath("/html/body/main/div[2]/div/div[2]/div/div[2]/div[1]/a"))
+        .find(By::XPath(
+            "/html/body/main/div[2]/div/div[2]/div/div[2]/div[1]/a",
+        ))
         .await?;
 
     let possible_download_url = download_button.attr("href").await?;
