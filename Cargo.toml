@@ -5,7 +5,6 @@ edition = "2021"
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
-thirtyfour = "0.35.0"
 reqwest = { version = "0.12.9", features = ["json", "stream"] }
 indicatif = "0.17"
 futures-util = "0.3.31"

@@ -1,15 +1,13 @@
 mod utils;
-
-use thirtyfour::prelude::*;
 use tokio;
 
 #[tokio::main]
-async fn main() -> WebDriverResult<()> {
+async fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
 
     if args.len() == 0 {
         utils::display_help_message();
-        return Ok(());
+        return;
     }
 
     let parsed_argument = args[0].to_ascii_lowercase().replace(" ", "-");
@@ -28,7 +26,7 @@ async fn main() -> WebDriverResult<()> {
             supported.len(),
             utils::RESET
         );
-        return Ok(());
+        return;
     }
 
     if parsed_argument == "search" && args.len() >= 2 {
@@ -48,7 +46,7 @@ async fn main() -> WebDriverResult<()> {
         println!("{}Top 10 Related Results:{}\n", utils::BLUE, utils::RESET);
         println!("{}{}{}", utils::WHITE, results.join(", "), utils::RESET);
 
-        return Ok(());
+        return;
     }
 
     if parsed_argument == "add" && args.len() >= 2 {
@@ -58,7 +56,7 @@ async fn main() -> WebDriverResult<()> {
                 println!("{}When adding to the title database, the second argument must be an {}integer id{} for the title, not {}`{}`{}", 
                 utils::BLUE, utils::WHITE, utils::BLUE, utils::WHITE, &args[1], utils::RESET
             );
-                return Ok(());
+                return;
             }
         };
 
@@ -103,14 +101,14 @@ async fn main() -> WebDriverResult<()> {
             )
         }
 
-        return Ok(());
+        return;
     }
 
     let title_id = utils::get_title_id(&parsed_argument, &pool).await;
 
     if title_id < 0 {
         println!("Title `{}` was not found in the database", &parsed_argument);
-        return Ok(());
+        return;
     }
 
     let base_text = reqwest::get(&format!("https://hshop.erista.me/t/{}", &title_id))
@@ -138,6 +136,4 @@ async fn main() -> WebDriverResult<()> {
             break;
         }
     }
-
-    Ok(())
 }
