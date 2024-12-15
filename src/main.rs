@@ -88,10 +88,10 @@ async fn main() -> WebDriverResult<()> {
         } else {
             println!(
                 "{}Could not add title {}`{}`{} to database with {}id `{}`{}",
-                utils::BLUE,
+                utils::GREEN,
                 utils::WHITE,
                 title,
-                utils::BLUE,
+                utils::GREEN,
                 utils::WHITE,
                 title_id,
                 utils::RESET
