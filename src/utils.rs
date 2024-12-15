@@ -116,6 +116,22 @@ pub async fn download_with_progress(
     Ok(())
 }
 
+pub fn extract_url(base_text: &Vec<String>) -> &str {
+    for i in base_text {
+        if i.contains("Direct Download") {
+            if let Some(start) = i.find("href=\"") {
+                let url_start = start + 6;
+                if let Some(end) = i[url_start..].find('"') {
+                    let url = &i[url_start..url_start + end];
+                    return url;
+                }
+            }
+            break;
+        }
+    }
+    return "";
+}
+
 pub fn display_help_message() {
     println!("{}Usage:{}", WHITE, RESET);
     println!("{}./hshopper {}\"<title-name>\" {}// Starts downloading the requested title to a cia file{}", BLUE, WHITE, GREEN, RESET);

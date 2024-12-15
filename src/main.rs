@@ -121,19 +121,9 @@ async fn main() {
         .map(|f| f.to_string())
         .collect::<Vec<String>>();
 
-    for i in &base_text {
-        if i.contains("Direct Download") {
-            if let Some(start) = i.find("href=\"") {
-                let url_start = start + 6;
-                if let Some(end) = i[url_start..].find('"') {
-                    let url = &i[url_start..url_start + end];
-                    println!("Requesting URL `{}`...", url);
-                    if let Err(e) = utils::download_with_progress(&url, &parsed_argument).await {
-                        eprintln!("Error during download: {}", e);
-                    }
-                }
-            }
-            break;
-        }
+    let request_url = utils::extract_url(&base_text);
+    println!("Requesting URL `{}`...", request_url);
+    if let Err(e) = utils::download_with_progress(&request_url, &parsed_argument).await {
+        eprintln!("Error during download: {}", e);
     }
 }
