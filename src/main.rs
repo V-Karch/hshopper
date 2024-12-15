@@ -23,13 +23,13 @@ async fn main() -> WebDriverResult<()> {
     
     if parsed_argument == "list-supported" {
         let supported = utils::get_supported_titles(&pool).await;
-        println!("Supported titles:");
-        println!("{}", supported.join("\n"));
+        println!("{}Supported titles:{}", utils::BLUE, utils::RESET);
+        println!("{}{}{}", utils::WHITE, supported.join(", "), utils::RESET);
         return Ok(());
     }
 
     if parsed_argument == "search" && args.len() >= 2 {
-        println!("Searching for title `{}`...", args[1]);
+        println!("{}Searching for title {}`{}`{}...{}", utils::BLUE, utils::WHITE, args[1], utils::BLUE, utils::RESET);
 
         let results = utils::search_titles_by_name(
             &pool, 
@@ -38,8 +38,8 @@ async fn main() -> WebDriverResult<()> {
                 .replace(" ", " "))
                 .await;
 
-        println!("Top 10 Related Results:");
-        println!("{}", results.join("\n"));
+        println!("{}Top 10 Related Results:{}\n", utils::BLUE, utils::RESET);
+        println!("{}{}{}", utils::WHITE, results.join(", "), utils::RESET);
 
         return Ok(());
     }
