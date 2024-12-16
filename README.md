@@ -13,25 +13,7 @@ HShopper is a Rust-based utility to interact with the [hshop](https://hshop.eris
 
 Run the `hshopper` executable with the following commands:
 
-Display Help:
-`./hshopper`
-Displays a list of all available commands.
-
-Download a Title:
-`./hshopper "<title-name>"`
-Downloads the requested title as a `.cia` file.
-
-Search for Titles:
-`./hshopper search <title-name>`
-Searches for titles matching `<title-name>` and displays the top 10 related results.
-
-Add a Title:
-`./hshopper add <id> <title-name>`
-Adds a new title to the database with its matching `<id>`.
-
-List Supported Titles:
-`./hshopper list-supported`
-Lists all titles currently supported by the database.
+![alt text](examples/example_help.png)  
 
 ## Example Scenarios
 
