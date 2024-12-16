@@ -1,4 +1,4 @@
-# HShopper
+# hshopper
 
 HShopper is a Rust-based utility to interact with the [hshop](https://hshop.erista.me/) 3DS ROM storage webpage. It simplifies searching, adding, and downloading titles directly from the terminal.
 
@@ -35,31 +35,17 @@ Lists all titles currently supported by the database.
 
 ## Example Scenarios
 
-Search for a title:
-`./hshopper search "pokemon"`
-Outputs:
-Searching for title `pokemon`...
-Top 10 Related Results:
-Pokémon Sun, Pokémon Moon, Pokémon Alpha Sapphire, ...
+Search for a title:  
+![alt text](examples/example_search.png)  
 
-Download a title:
-`./hshopper "pokemon sun"`
-Outputs:
-Requesting URL `https://hshop.erista.me/t/<title-id>`...
-Downloading Pokémon Sun.cia...
+Download a title:  
+![alt text](examples/example_download.gif)  
 
-Add a new title:
-`./hshopper add 12345 "new-title"`
-Outputs:
-Attempting to add title `new-title` with id `12345`...
-Added title `new-title` to the database with id `12345`.
+Add a new title:  
+![alt text](examples/example_add.png)  
 
-List all supported titles:
-`./hshopper list-supported`
-Outputs:
-Supported titles:
-Pokémon Sun, Pokémon Moon, Pokémon Alpha Sapphire, ...
-100 total supported titles.
+List all supported titles:  
+![alt text](examples/example_list_supported.png)
 
 ## Contributing
 
