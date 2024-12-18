@@ -1,5 +1,5 @@
-use tokio;
 use clap::Parser;
+use tokio;
 
 mod cli_parse;
 mod utils;
@@ -84,27 +84,20 @@ async fn main() {
         }
         Some(cli_parse::Commands::Download { name }) => {
             let title_name = name.join("-").to_ascii_lowercase();
-            let title_id = utils::get_title_id(&title_name, &pool).await;
-
-            if title_id < 0 {
-                println!("Title `{}` was not found in the database", &title_name);
-                return;
-            }
-
-            let base_text = reqwest::get(&format!("https://hshop.erista.me/t/{}", &title_id))
-                .await
-                .expect("Failed to make initial request")
-                .text()
-                .await
-                .expect("Failed to parse request text")
-                .lines()
-                .map(|f| f.to_string())
-                .collect::<Vec<String>>();
-
-            let request_url = utils::extract_url(&base_text);
-            println!("Requesting URL `{}`...", request_url);
-            if let Err(e) = utils::download_with_progress(&request_url, &title_name).await {
-                eprintln!("Error during download: {}", e);
+            utils::setup_and_download(&title_name, &pool).await;
+        }
+        Some(cli_parse::Commands::BatchDownload { titles }) => {
+            for title_name in titles {
+                let title = title_name.replace(" ", "-").to_ascii_lowercase();
+                println!(
+                    "{}Processing title {}`{}`{}...{}",
+                    utils::BLUE,
+                    utils::WHITE,
+                    title_name,
+                    utils::BLUE,
+                    utils::RESET
+                );
+                utils::setup_and_download(&title, &pool).await;
             }
         }
         None => {

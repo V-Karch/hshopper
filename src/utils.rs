@@ -116,6 +116,31 @@ pub async fn download_with_progress(
     Ok(())
 }
 
+pub async fn setup_and_download(title_name: &str, pool: &SqlitePool) {
+    let title_id = get_title_id(&title_name, &pool).await;
+
+    if title_id < 0 {
+        println!("Title `{}` was not found in the database", &title_name);
+        return;
+    }
+
+    let base_text = reqwest::get(&format!("https://hshop.erista.me/t/{}", &title_id))
+        .await
+        .expect("Failed to make initial request")
+        .text()
+        .await
+        .expect("Failed to parse request text")
+        .lines()
+        .map(|f| f.to_string())
+        .collect::<Vec<String>>();
+
+    let request_url = extract_url(&base_text);
+    println!("Requesting URL `{}`...", request_url);
+    if let Err(e) = download_with_progress(&request_url, &title_name).await {
+        eprintln!("Error during download: {}", e);
+    }
+}
+
 pub fn extract_url(base_text: &Vec<String>) -> &str {
     for i in base_text {
         if i.contains("Direct Download") {
