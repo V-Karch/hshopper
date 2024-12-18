@@ -159,6 +159,7 @@ pub fn extract_url(base_text: &Vec<String>) -> &str {
 
 pub fn display_help_message() {
     println!("{}Usage:{}", WHITE, RESET);
+    println!("{}./hshopper help {} // Displays this message", BLUE, GREEN);
     println!("{}./hshopper download {}<title-name> {}// Starts downloading the requested title to a cia file{}", BLUE, WHITE, GREEN, RESET);
     println!("{}./hshopper batch-download {}\"<title-name>\" \"<title-name>\" \"<title-name>\" ... {}// Downloads multiple requested titles to respective cia files{}",
         BLUE, WHITE, GREEN, RESET
