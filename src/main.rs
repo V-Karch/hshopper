@@ -6,6 +6,13 @@ mod utils;
 
 #[tokio::main]
 async fn main() {
+    let args: Vec<String> = std::env::args().collect();
+
+    if args.len() > 1 && args[1] == "help" {
+        utils::display_help_message();
+        return;
+    }
+
     let cli = cli_parse::Cli::parse();
 
     let pool = utils::connect()
@@ -39,6 +46,9 @@ async fn main() {
 
             println!("{}Top 10 Related Results:{}\n", utils::BLUE, utils::RESET);
             println!("{}{}{}", utils::WHITE, results.join(", "), utils::RESET);
+        }
+        Some(cli_parse::Commands::NetSearch { title }) => {
+            println!("Test: {:?}", title)
         }
         Some(cli_parse::Commands::Add { id, name }) => {
             let title = name.join("-");
