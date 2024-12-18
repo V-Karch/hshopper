@@ -1,12 +1,12 @@
 [package]
 name = "hshopper"
-version = "0.0.4"
+version = "0.0.5"
 edition = "2021"
 
 [dependencies]
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1.42.0", features = ["full"] }
 reqwest = { version = "0.12.9", features = ["json", "stream"] }
-indicatif = "0.17"
+indicatif = "0.17.9"
 futures-util = "0.3.31"
 sqlx = { version = "0.8.2", features = ["sqlite", "runtime-tokio-native-tls"] }
-clap = { version = "4.1", features = ["derive"] }
+clap = { version = "4.5.23", features = ["derive"] }
