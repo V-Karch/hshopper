@@ -95,11 +95,10 @@ pub async fn download_with_progress(
         .ok_or("Failed to get content length")?;
 
     let pb = ProgressBar::new(total_size);
-    pb.set_style(
-        ProgressStyle::default_bar()
-            .template("{spinner:.GREEN} [{elapsed_precise}] [{wide_bar:.cyan/BLUE}] {bytes}/{total_bytes} ({eta})")?
-            .progress_chars("#>-"),
-    );
+    let style = ProgressStyle::default_bar()
+        .template("[{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} ({eta})")?
+        .progress_chars("#>-");
+    pb.set_style(style);
 
     let mut file = AsyncFile::create(format!("{}.cia", name)).await?;
     let mut downloaded: u64 = 0;
