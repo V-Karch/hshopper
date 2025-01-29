@@ -10,6 +10,12 @@ pub static GREEN: &str = "\x1b[38;2;10;178;46m";
 pub static WHITE: &str = "\x1b[38;2;255;255;255m";
 pub static RESET: &str = "\x1b[0m";
 
+pub struct Entry {
+    title: String,
+    region: String,
+    id: String,
+}
+
 pub async fn connect() -> Result<Pool<sqlx::Sqlite>, sqlx::Error> {
     let pool: Pool<sqlx::Sqlite> = SqlitePool::connect("sqlite:titledb.db").await?;
     return Ok(pool);
@@ -80,6 +86,46 @@ pub async fn get_supported_titles(pool: &SqlitePool) -> Vec<String> {
             })
             .collect(),
         Err(_) => vec![],
+    }
+}
+
+pub async fn search_titles_by_name_net(query: &str) {
+    let url = format!(
+        "https://hshop.erista.me/search/results?q={}&qt=Text&lgy=false&count=100",
+        query
+    );
+
+    let response = reqwest::get(&url).await;
+
+    let result = match response {
+        Ok(res) => match res.text().await {
+            Ok(text) => text,
+            Err(_) => String::new(),
+        },
+        Err(_) => String::new(),
+    };
+
+    if result == "" {
+        println!("The request search failed");
+        return;
+    }
+
+    let mut found_flag = false;
+
+    for i in result.lines() {
+        if i.contains("green bold nospace") {
+            println!("BEGIN BLOCK\n");
+            found_flag = true;
+        }
+
+        if found_flag {
+            println!("{i}");
+        }
+
+        if i.contains("/a") && found_flag {
+            found_flag = false;
+            println!("END BLOCK\n");
+        }
     }
 }
 

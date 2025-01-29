@@ -48,7 +48,9 @@ async fn main() {
             println!("{}{}{}", utils::WHITE, results.join(", "), utils::RESET);
         }
         Some(cli_parse::Commands::NetSearch { title }) => {
-            println!("Test: {:?}", title)
+            let search_title = title.join(" ").to_ascii_lowercase();
+            
+            utils::search_titles_by_name_net(&search_title).await;
         }
         Some(cli_parse::Commands::Add { id, name }) => {
             let title = name.join("-");
