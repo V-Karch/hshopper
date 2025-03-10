@@ -36,3 +36,4 @@ Contributions are welcome! Please ensure all code adheres to Rust best practices
 ## License
 
 HShopper is open-source and available under the [MIT License](LICENSE).
+
