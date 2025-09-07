@@ -1,5 +1,7 @@
 # hshopper
 
+# ⚠️ This project is no longer supported or functional due to implementation of captcha to stop automated download requests
+
 HShopper is a Rust-based utility to interact with the [hshop](https://hshop.erista.me/) 3DS ROM storage webpage. It simplifies searching, adding, and downloading titles directly from the terminal.
 
 ## Features
